@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Summary - Smart Attendance System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Attendance Summary</h1>
+    <div>
+        <a href="{% url 'index' %}" class="btn btn-primary">
+            <i class="bi bi-house"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-light text-center">
+            <div class="card-body py-3">
+                <h6 class="text-muted">Total Students</h6>
+                <h2>{{ total_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-light text-center">
+            <div class="card-body py-3">
+                <h6 class="text-muted">Present</h6>
+                <h2 class="text-success">{{ present_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-light text-center">
+            <div class="card-body py-3">
+                <h6 class="text-muted">Late</h6>
+                <h2 class="text-warning">{{ late_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-light text-center">
+            <div class="card-body py-3">
+                <h6 class="text-muted">Absent</h6>
+                <h2 class="text-danger">{{ absent_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Attendance Records</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Faculty</th>
+                        <th>Group</th>
+                        <th>Status</th>
+                        <th>Arrival Time</th>
+                        <th>Recognition %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                        <tr>
+                            <td>{{ record.student.name }} {{ record.student.surname }}</td>
+                            <td>{{ record.student.faculty }}</td>
+                            <td>{{ record.student.group }}</td>
+                            <td>
+                                {% if record.status == 'Present' %}
+                                    <span class="badge bg-success">Present</span>
+                                {% elif record.status == 'Late' %}
+                                    <span class="badge bg-warning">Late</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Absent</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ record.arrival_time|default:'-' }}</td>
+                            <td>
+                                {% if record.recognition_probability > 0 %}
+                                    {{ record.recognition_probability|floatformat:2 }}%
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-end">
+            <a href="{% url 'reports' %}" class="btn btn-primary">
+                <i class="bi bi-file-earmark-text"></i> Go to Reports
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

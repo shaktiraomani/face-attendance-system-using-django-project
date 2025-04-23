@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Student - Smart Attendance System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Add New Student</h1>
+    <a href="{% url 'students_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Students
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Student Information</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.name|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.surname|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.father_name|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.faculty|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.direction|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.group|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.photos.id_for_label }}" class="form-label">Student Photos (at least 4)</label>
+                <div class="border border-2 border-dashed rounded p-4 text-center">
+                    <i class="bi bi-upload fs-1 text-muted"></i>
+                    <p class="mt-2 text-muted">Upload at least 4 photos of the student for face recognition</p>
+                    {{ form.photos }}
+                    <small class="form-text text-muted">Each photo should clearly show the student's face.</small>
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Add Student
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

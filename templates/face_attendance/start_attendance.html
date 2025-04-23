@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Session - Smart Attendance System{% endblock %}
+
+{% block extra_css %}
+<style>
+    #video-container {
+        position: relative;
+        width: 100%;
+        background-color: #000;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    #attendance-log {
+        height: 300px;
+        overflow-y: auto;
+    }
+    
+    .status-present {
+        color: #198754;
+    }
+    
+    .status-late {
+        color: #fd7e14;
+    }
+    
+    .status-absent {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Live Attendance</h1>
+    <div>
+        <a href="{% url 'stop_attendance' %}" class="btn btn-danger">
+            <i class="bi bi-camera-video-off"></i> Stop Session
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-camera-video"></i> Camera Feed
+                </h5>
+                <div id="timer" class="badge bg-primary"></div>
+            </div>
+            <div class="card-body">
+                <div id="video-container">
+                    <img src="{% url 'video_feed' %}" width="100%" alt="Video Feed">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-check"></i> Attendance Log
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="attendance-log" class="list-group">
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-hourglass fs-2"></i>
+                        <p>Waiting for students...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up"></i> Session Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body py-3">
+                                <h6 class="text-muted">Total Students</h6>
+                                <h2 id="total-count">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body py-3">
+                                <h6 class="text-muted">Present</h6>
+                                <h2 id="present-count" class="text-success">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body py-3">
+                                <h6 class="text-muted">Late</h6>
+                                <h2 id="late-count" class="text-warning">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body py-3">
+                                <h6 class="text-muted">Absent</h6>
+                                <h2 id="absent-count" class="text-danger">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Update attendance status every 5 seconds
+        function updateAttendanceStatus() {
+            $.ajax({
+                url: '{% url "attendance_status" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    // Update statistics
+                    $('#present-count').text(data.present);
+                    $('#late-count').text(data.late);
+                    $('#absent-count').text(data.absent);
+                    $('#total-count').text(data.total);
+                    
+                    // Update attendance log
+                    if (data.recent_records.length > 0) {
+                        $('#attendance-log').empty();
+                        
+                        $.each(data.recent_records, function(index, record) {
+                            var statusClass = '';
+                            var statusIcon = '';
+                            
+                            if (record.status === 'Present') {
+                                statusClass = 'status-present';
+                                statusIcon = 'bi-person-check';
+                            } else if (record.status === 'Late') {
+                                statusClass = 'status-late';
+                                statusIcon = 'bi-person-x';
+                            }
+                            
+                            var html = `
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            <i class="bi ${statusIcon} ${statusClass}"></i>
+                                            ${record.name}
+                                        </h6>
+                                        <small>${record.time}</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="${statusClass}">${record.status}</small>
+                                        <small>Recognition: ${record.probability}</small>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            $('#attendance-log').prepend(html);
+                        });
+                    }
+                    
+                    // Check if session has expired
+                    if (data.session_expired) {
+                        window.location.href = '{% url "stop_attendance" %}';
+                    }
+                },
+                error: function() {
+                    console.log('Error fetching attendance status');
+                }
+            });
+        }
+        
+        // Update timer
+        function updateTimer() {
+            var now = new Date();
+            var deadline = new Date('{{ deadline.isoformat }}');
+            
+            if (now >= deadline) {
+                window.location.href = '{% url "stop_attendance" %}';
+                return;
+            }
+            
+            var diff = Math.floor((deadline - now) / 1000);
+            var minutes = Math.floor(diff / 60);
+            var seconds = diff % 60;
+            
+            $('#timer').text(
+                'Time remaining: ' + 
+                (minutes < 10 ? '0' : '') + minutes + ':' + 
+                (seconds < 10 ? '0' : '') + seconds
+            );
+        }
+        
+        // Initial update
+        updateAttendanceStatus();
+        updateTimer();
+        
+        // Set intervals
+        setInterval(updateAttendanceStatus, 5000);
+        setInterval(updateTimer, 1000);
+    });
+</script>
+{% endblock %}

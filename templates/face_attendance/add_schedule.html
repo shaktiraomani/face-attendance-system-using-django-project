@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Schedule - Smart Attendance System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Add/Edit Schedule</h1>
+    <a href="{% url 'schedules' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Schedules
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Schedule Information</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                {{ form.day|as_crispy_field }}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    {{ form.start_time|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form.late_time|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form.end_time|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Schedule
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

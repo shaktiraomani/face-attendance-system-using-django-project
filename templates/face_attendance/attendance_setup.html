@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Attendance Setup - Smart Attendance System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Attendance Setup</h1>
+    <a href="{% url 'index' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Home
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Attendance Settings</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label">Attendance Mode</label>
+                <div class="ms-2">
+                    {{ form.mode|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                {{ form.database|as_crispy_field }}
+            </div>
+            
+            <div class="mb-3 schedule-field" style="display: none;">
+                {{ form.schedule|as_crispy_field }}
+            </div>
+            
+            <div class="mb-3">
+                {{ form.camera|as_crispy_field }}
+            </div>
+            
+            <div class="mb-3 ip-camera-field" style="display: none;">
+                {{ form.ip_camera|as_crispy_field }}
+            </div>
+            
+            <div class="manual-fields">
+                <h5 class="mb-3">Late Deadline</h5>
+                <div class="mb-3">
+                    <div class="ms-2">
+                        {{ form.late_deadline_type|as_crispy_field }}
+                    </div>
+                </div>
+                
+                <div class="mb-3 late-time-fields">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.late_hour|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.late_minute|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3 late-timer-fields" style="display: none;">
+                    {{ form.late_timer|as_crispy_field }}
+                </div>
+                
+                <h5 class="mb-3">Attendance End Time</h5>
+                <div class="mb-3">
+                    <div class="ms-2">
+                        {{ form.deadline_type|as_crispy_field }}
+                    </div>
+                </div>
+                
+                <div class="mb-3 time-fields">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.hour|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.minute|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3 timer-fields" style="display: none;">
+                    {{ form.timer|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-check"></i> Start Attendance
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Toggle camera fields
+        $('#id_camera').change(function() {
+            if ($(this).val() === 'ip') {
+                $('.ip-camera-field').show();
+            } else {
+                $('.ip-camera-field').hide();
+            }
+        });
+        
+        // Toggle mode fields
+        $('input[name="mode"]').change(function() {
+            if ($(this).val() === 'manual') {
+                $('.manual-fields').show();
+                $('.schedule-field').hide();
+            } else {
+                $('.manual-fields').hide();
+                $('.schedule-field').show();
+            }
+        });
+        
+        // Toggle late deadline fields
+        $('input[name="late_deadline_type"]').change(function() {
+            if ($(this).val() === 'time') {
+                $('.late-time-fields').show();
+                $('.late-timer-fields').hide();
+            } else {
+                $('.late-time-fields').hide();
+                $('.late-timer-fields').show();
+            }
+        });
+        
+        // Toggle deadline fields
+        $('input[name="deadline_type"]').change(function() {
+            if ($(this).val() === 'time') {
+                $('.time-fields').show();
+                $('.timer-fields').hide();
+            } else {
+                $('.time-fields').hide();
+                $('.timer-fields').show();
+            }
+        });
+        
+        // Trigger change events on page load
+        $('#id_camera').trigger('change');
+        $('input[name="mode"]:checked').trigger('change');
+        $('input[name="late_deadline_type"]:checked').trigger('change');
+        $('input[name="deadline_type"]:checked').trigger('change');
+    });
+</script>
+{% endblock %}

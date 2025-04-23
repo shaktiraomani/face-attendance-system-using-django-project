@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">Smart Attendance System</h1>
+    <p class="lead">Face recognition based attendance tracking</p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col">
+        <div class="card h-100 card-hover">
+            <div class="card-body text-center">
+                <i class="bi bi-person-check fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Take Attendance</h5>
+                <p class="card-text">Start attendance tracking session using face recognition.</p>
+                <a href="{% url 'attendance_setup' %}" class="btn btn-primary">Start Session</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card h-100 card-hover">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Manage Students</h5>
+                <p class="card-text">Add and manage student records and their face recognition data.</p>
+                <a href="{% url 'students_list' %}" class="btn btn-primary">Manage Students</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card h-100 card-hover">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-week fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Schedules</h5>
+                <p class="card-text">Create and manage attendance schedules for different days.</p>
+                <a href="{% url 'schedules' %}" class="btn btn-primary">Manage Schedules</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card h-100 card-hover">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-text fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Reports</h5>
+                <p class="card-text">View and export attendance reports and statistics.</p>
+                <a href="{% url 'reports' %}" class="btn btn-primary">View Reports</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card h-100 card-hover">
+            <div class="card-body text-center">
+                <i class="bi bi-gear fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Settings</h5>
+                <p class="card-text">Configure system settings, contacts, and email settings.</p>
+                <a href="{% url 'settings' %}" class="btn btn-primary">Settings</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
